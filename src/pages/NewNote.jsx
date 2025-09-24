@@ -1,18 +1,26 @@
 import { useState } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
+import { useNotification } from "../context/NotificationContext";
 import { Box, TextField, Button, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 
 const NewNote = () => {
   const { addNote, doss } = useOutletContext();
   const navigate = useNavigate();
+  const { notify } = useNotification();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [selectedDoss, setSelectedDoss] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    addNote({ title, content, description: content.substring(0, 30) + "...", dossId: selectedDoss });
-    navigate("/dos");
+    try {
+      await addNote({ title, content, description: content.substring(0, 30) + "...", dossId: selectedDoss });
+      notify("Do saved successfully!", "success");
+      navigate("/dos");
+    } catch (error) {
+      notify("Failed to save Do.", "error");
+      console.error("Error adding note:", error);
+    }
   };
 
   return (

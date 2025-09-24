@@ -1,7 +1,5 @@
 {
   "projects": {
     "default": "gemnote-3ce83"
-  },
-  "targets": {},
-  "etags": {}
+  }
 }

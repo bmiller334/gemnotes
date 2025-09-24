@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate, Link } from 'react-router-dom';
-import { Box, TextField, Button, Typography, Container } from '@mui/material';
+import { Box, TextField, Button, Typography, Container, Grid } from '@mui/material';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -34,7 +34,7 @@ const Login = () => {
         <Typography component="h1" variant="h5">
           Log In
         </Typography>
-        {error && <Typography color="error">{error}</Typography>}
+        {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
             margin="normal"
@@ -68,9 +68,22 @@ const Login = () => {
           >
             Log In
           </Button>
-          <Typography variant="body2" align="center">
-            Don't have an account? <Link to="/signup">Sign Up</Link>
-          </Typography>
+          <Grid container>
+            <Grid item xs>
+              <Link to="/forgot-password">
+                <Typography variant="body2">
+                  Forgot password?
+                </Typography>
+              </Link>
+            </Grid>
+            <Grid item>
+              <Link to="/signup">
+                <Typography variant="body2">
+                  {"Don't have an account? Sign Up"}
+                </Typography>
+              </Link>
+            </Grid>
+          </Grid>
         </Box>
       </Box>
     </Container>
