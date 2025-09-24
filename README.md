@@ -1,12 +1,19 @@
-# React + Vite
+# Dosser
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Dosser is a modern, intelligent note-taking application.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This project is a React application built with Vite, Material-UI, and Firebase. Its core feature is the ability to automatically categorize notes (called "Do's") into user-defined categories (called "Doss") using the Gemini API.
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+*   **Frontend:** React, Vite, React Router
+*   **UI:** Material-UI (MUI)
+*   **Backend:** Firebase (Firestore, Cloud Functions)
+*   **AI:** Google Gemini API
+
+## Getting Started
+
+1.  Run `npm install` to install dependencies.
+2.  Run `npm run dev` to start the development server.

@@ -1,9 +1,10 @@
-import { Typography, Grid, Card, CardContent, Box, Chip } from "@mui/material";
+import { Typography, Grid, Card, CardContent, Box, Chip, IconButton } from "@mui/material";
 import { useParams, useOutletContext } from "react-router-dom";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const DossNotes = () => {
   const { dossId } = useParams();
-  const { notes, doss } = useOutletContext();
+  const { notes, doss, deleteNote } = useOutletContext();
 
   // Find the name of the current Doss
   const currentDoss = doss.find(d => d.id === dossId);
@@ -35,6 +36,11 @@ const DossNotes = () => {
                   <Typography variant="body2">
                     {note.content}
                   </Typography>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1 }}>
+                    <IconButton aria-label="delete" onClick={() => deleteNote(note.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>

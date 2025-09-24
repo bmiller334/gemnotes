@@ -31,9 +31,6 @@ export const categorizeNote = onDocumentCreated(
 
     logger.log(`Starting categorization for note: ${event.params.noteId}`);
     const db = getFirestore();
-
-    // The Definitive Fix:
-    // Wait for the full list of Doss before proceeding.
     const dossSnapshot = await db.collection("doss").get();
     const doss = dossSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
@@ -43,12 +40,18 @@ export const categorizeNote = onDocumentCreated(
 
     const dossList = doss.map(d => `- ${d.name}`).join("\n");
     
-    const prompt = `SYSTEM: You are a text classification engine. Your only job is to classify the user's NOTE into one of the provided CATEGORIES. You must respond with only the single, exact name of the category you choose. Do not add any other words, punctuation, or explanation.
+    // New, rule-based prompt
+    const prompt = `SYSTEM: You are a strict text classification engine. Your task is to classify a NOTE into one of the CATEGORIES provided. 
+RULES:
+1. You MUST respond with only the single, exact name of the category.
+2. If the NOTE does not clearly relate to any of the provided CATEGORIES, you MUST respond with the word "Others".
+Do not add any other words, punctuation, or explanation.
 
 ---
 
 CATEGORIES:
 ${dossList}
+- Others
 
 ---
 

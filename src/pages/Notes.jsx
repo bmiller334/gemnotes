@@ -1,8 +1,9 @@
 import { useOutletContext } from "react-router-dom";
-import { Typography, Grid, Card, CardContent, Chip, Box } from "@mui/material";
+import { Typography, Grid, Card, CardContent, Chip, Box, IconButton } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const Notes = () => {
-  const { notes, doss } = useOutletContext();
+  const { notes, doss, deleteNote } = useOutletContext();
 
   const getDossName = (dossId) => {
     if (!dossId) return "Uncategorized";
@@ -33,6 +34,11 @@ const Notes = () => {
                 <Typography variant="body2">
                   {note.content}
                 </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1 }}>
+                  <IconButton aria-label="delete" onClick={() => deleteNote(note.id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
               </CardContent>
             </Card>
           </Grid>
