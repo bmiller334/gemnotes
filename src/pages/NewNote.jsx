@@ -2,19 +2,22 @@ import { useState } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { useNotification } from "../context/NotificationContext";
 import { Box, TextField, Button, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import RichTextEditor from '../components/RichTextEditor';
 
 const NewNote = () => {
   const { addNote, doss } = useOutletContext();
   const navigate = useNavigate();
   const { notify } = useNotification();
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(""); // This will now hold HTML content
   const [selectedDoss, setSelectedDoss] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    // Create a plain text description for the card view
+    const plainTextContent = new DOMParser().parseFromString(content, 'text/html').body.textContent || "";
     try {
-      await addNote({ title, content, description: content.substring(0, 30) + "...", dossId: selectedDoss });
+      await addNote({ title, content, description: plainTextContent.substring(0, 100) + "...", dossId: selectedDoss });
       notify("Do saved successfully!", "success");
       navigate("/dos");
     } catch (error) {
@@ -43,10 +46,8 @@ const NewNote = () => {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         sx={{
-          '& .MuiInput-underline:before': { borderBottomColor: 'grey.400' },
-          '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderBottomColor: 'primary.main' },
-          '& .MuiInputBase-root': { fontSize: '1.5rem' },
-          '& .MuiInputLabel-root': { fontSize: '1.5rem' },
+          '& .MuiInputBase-root': { fontSize: '1.75rem', fontWeight: 'bold' },
+          '& .MuiInputLabel-root': { fontSize: '1.75rem' },
         }}
       />
       <FormControl fullWidth>
@@ -66,17 +67,9 @@ const NewNote = () => {
           ))}
         </Select>
       </FormControl>
-      <TextField
-        id="do-content"
-        label="Start writing..."
-        variant="outlined"
-        multiline
-        rows={15}
-        fullWidth
-        autoFocus
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
+      
+      <RichTextEditor value={content} onChange={setContent} />
+      
       <Button type="submit" variant="contained" size="large" sx={{ alignSelf: 'flex-end' }}>
         Save Do
       </Button>
