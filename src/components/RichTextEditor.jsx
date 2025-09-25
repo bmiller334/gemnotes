@@ -13,9 +13,11 @@ const modules = {
   ],
 };
 
-const RichTextEditor = ({ value, onChange }) => {
+// Use React.forwardRef to pass the ref to the ReactQuill component
+const RichTextEditor = React.forwardRef(({ value, onChange }, ref) => {
   return (
     <ReactQuill
+      ref={ref}
       theme="snow"
       value={value}
       onChange={onChange}
@@ -23,6 +25,8 @@ const RichTextEditor = ({ value, onChange }) => {
       style={{ height: '300px', marginBottom: '50px' }}
     />
   );
-};
+});
+
+RichTextEditor.displayName = 'RichTextEditor';
 
 export default RichTextEditor;

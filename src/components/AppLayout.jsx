@@ -25,27 +25,36 @@ import HomeIcon from "@mui/icons-material/Home";
 import BookIcon from "@mui/icons-material/Book";
 import FolderIcon from '@mui/icons-material/Folder';
 import LogoutIcon from '@mui/icons-material/Logout';
+import ReloadPrompt from './ReloadPrompt';
 
 const AppLayout = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, loading: authLoading } = useAuth(); // We only need the auth loading state
   const [notes, setNotes] = useState([]);
   const [doss, setDoss] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (currentUser) {
       const notesQuery = query(collection(db, "notes"), where("userId", "==", currentUser.uid), orderBy("createdAt", "desc"));
-      const unsubscribeNotes = onSnapshot(notesQuery, (snapshot) => {
-        setNotes(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-        setIsLoading(false); 
-      });
+      const unsubscribeNotes = onSnapshot(notesQuery, 
+        (snapshot) => {
+          setNotes(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+        },
+        (error) => {
+          console.error("Error fetching notes:", error);
+        }
+      );
 
       const dossQuery = query(collection(db, "doss"), where("userId", "==", currentUser.uid));
-      const unsubscribeDoss = onSnapshot(dossQuery, (snapshot) => {
-        setDoss(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-      });
+      const unsubscribeDoss = onSnapshot(dossQuery, 
+        (snapshot) => {
+          setDoss(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+        },
+        (error) => {
+          console.error("Error fetching doss:", error);
+        }
+      );
 
       return () => {
         unsubscribeNotes();
@@ -75,14 +84,12 @@ const AppLayout = () => {
   const deleteDoss = async (dossId) => {
     await deleteDoc(doc(db, "doss", dossId));
   };
-
   const addContextToDoss = async (dossId, context) => {
     const docRef = doc(db, "doss", dossId);
     await updateDoc(docRef, {
       context: arrayUnion(context)
     });
   };
-
   const deleteContextFromDoss = async (dossId, context) => {
     const docRef = doc(db, "doss", dossId);
     await updateDoc(docRef, {
@@ -102,7 +109,9 @@ const AppLayout = () => {
     { text: "Settings", icon: <SettingsIcon />, path: "/settings" },
   ];
 
-  if (isLoading) {
+  // We only show the main spinner while authenticating.
+  // The page will render with empty data while Firestore loads from cache.
+  if (authLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
@@ -144,6 +153,8 @@ const AppLayout = () => {
       <Container sx={{ mt: 4 }}>
         <Outlet context={{ notes, addNote, deleteNote, doss, addDoss, deleteDoss, addContextToDoss, deleteContextFromDoss }} />
       </Container>
+      
+      <ReloadPrompt />
     </>
   );
 };
