@@ -16,7 +16,6 @@ import {
   ListItemIcon,
   Container,
   Box,
-  CircularProgress,
   Divider,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -28,13 +27,15 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import ReloadPrompt from './ReloadPrompt';
 
 const AppLayout = () => {
-  const { currentUser, loading: authLoading } = useAuth(); // We only need the auth loading state
+  const { currentUser } = useAuth();
   const [notes, setNotes] = useState([]);
   const [doss, setDoss] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // If there is a user, set up the real-time listeners.
+    // The UI will render immediately with empty arrays, then update as data arrives.
     if (currentUser) {
       const notesQuery = query(collection(db, "notes"), where("userId", "==", currentUser.uid), orderBy("createdAt", "desc"));
       const unsubscribeNotes = onSnapshot(notesQuery, 
@@ -56,6 +57,7 @@ const AppLayout = () => {
         }
       );
 
+      // Clean up the listeners on component unmount
       return () => {
         unsubscribeNotes();
         unsubscribeDoss();
@@ -108,16 +110,6 @@ const AppLayout = () => {
     { text: "All Doss", icon: <FolderIcon />, path: "/doss" },
     { text: "Settings", icon: <SettingsIcon />, path: "/settings" },
   ];
-
-  // We only show the main spinner while authenticating.
-  // The page will render with empty data while Firestore loads from cache.
-  if (authLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
 
   return (
     <>

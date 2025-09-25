@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate, Link } from 'react-router-dom';
-import { Box, TextField, Button, Typography, Container, Grid } from '@mui/material';
+import { Box, TextField, Button, Typography, Container, Grid, Divider } from '@mui/material';
+import GoogleIcon from '@mui/icons-material/Google';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -10,11 +11,22 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleEmailSignIn = async (e) => {
     e.preventDefault();
     setError('');
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      navigate('/');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError('');
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -34,8 +46,21 @@ const Login = () => {
         <Typography component="h1" variant="h5">
           Log In
         </Typography>
-        {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        {error && <Typography color="error" sx={{ mt: 2, textAlign: 'center' }}>{error}</Typography>}
+        
+        <Button
+            fullWidth
+            variant="outlined"
+            startIcon={<GoogleIcon />}
+            onClick={handleGoogleSignIn}
+            sx={{ mt: 3, mb: 2 }}
+        >
+            Sign In with Google
+        </Button>
+        
+        <Divider sx={{ width: '100%', mb: 2 }}>OR</Divider>
+
+        <Box component="form" onSubmit={handleEmailSignIn} noValidate sx={{ mt: 1 }}>
           <TextField
             margin="normal"
             required
@@ -66,19 +91,19 @@ const Login = () => {
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
-            Log In
+            Log In with Email
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link to="/forgot-password">
-                <Typography variant="body2">
+              <Link to="/forgot-password" style={{ textDecoration: 'none' }}>
+                <Typography variant="body2" color="primary">
                   Forgot password?
                 </Typography>
               </Link>
             </Grid>
             <Grid item>
-              <Link to="/signup">
-                <Typography variant="body2">
+              <Link to="/signup" style={{ textDecoration: 'none' }}>
+                <Typography variant="body2" color="primary">
                   {"Don't have an account? Sign Up"}
                 </Typography>
               </Link>
