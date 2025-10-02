@@ -20,8 +20,8 @@ const NoteList = () => {
       <Grid container spacing={4}>
         {notes.map((note) => (
           <Grid item xs={12} sm={6} md={4} key={note.id}>
-            <Card>
-              <CardActionArea component={Link} to={`/dos/${note.id}`}>
+            <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <CardActionArea component={Link} to={`/dos/${note.id}`} sx={{ flexGrow: 1 }}>
                 <CardContent>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
                     <Typography variant="h5" component="div" noWrap>
@@ -29,15 +29,20 @@ const NoteList = () => {
                     </Typography>
                     <Chip label={getDossName(note.dossId)} size="small" />
                   </Box>
-                  {/* Display the AI-generated summary */}
-                  <Typography variant="body2" color="text.secondary" sx={{
+                  <Box
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
                       display: '-webkit-box',
                       overflow: 'hidden',
                       WebkitBoxOrient: 'vertical',
                       WebkitLineClamp: 3,
-                    }}>
-                    {note.summary || note.content}
-                  </Typography>
+                      // Use Quill's editor class for consistent font and styling
+                      '&.ql-editor': { p: 0, fontSize: '0.875rem' }
+                    }}
+                    className="ql-editor"
+                    dangerouslySetInnerHTML={{ __html: note.summary || note.content }}
+                  />
                 </CardContent>
               </CardActionArea>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>

@@ -1,23 +1,33 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Rules for the 'notes' collection
+    // A user can read, update, or delete a note if it exists and its userId matches.
+    // A user can create a note if the new note's userId matches their own.
     match /notes/{noteId} {
-      // A user can create a note if the new note's userId matches their own.
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-
-      // A user can read, update, or delete a note if it already exists and its userId matches.
       allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
 
-    // Rules for the 'doss' collection
+    // A user can read, update, or delete a doss if it exists and its userId matches.
+    // A user can create a doss if the new doss's userId matches their own.
     match /doss/{dossId} {
-      // A user can create a doss if the new doss's userId matches their own.
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-
-      // A user can read, update, or delete a doss if it already exists and its userId matches.
       allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+
+    // A user can read, update, or delete a tado if it exists and its userId matches.
+    // A user can create a tado if the new tado's userId matches their own.
+    match /tados/{tadoId} {
+      allow read, update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Gemini logs can be read by the user who owns them, but can only be created by the backend.
+    match /gemini_logs/{logId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create, update, delete: if false; 
     }
   }
 }

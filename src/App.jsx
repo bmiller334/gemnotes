@@ -12,6 +12,7 @@ import NoteDetail from "./pages/NoteDetail";
 import Doss from "./pages/Doss";
 import DossNotes from "./pages/DossNotes";
 import DossDetail from "./pages/DossDetail";
+import Tados from "./pages/Tados";
 import Settings from "./pages/Settings";
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
               <Route path="doss" element={<Doss />} />
               <Route path="doss/:dossId" element={<DossNotes />} />
               <Route path="doss/:dossId/manage" element={<DossDetail />} />
+              <Route path="tados" element={<Tados />} />
               <Route path="settings" element={<Settings />} />
             </Route>
             <Route path="/login" element={<Login />} />

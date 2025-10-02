@@ -14,7 +14,6 @@ const DossNotes = () => {
   const dossName = currentDoss ? currentDoss.name : dossId;
   const filteredNotes = notes.filter(note => note.dossId === dossId);
 
-  // --- Action Items Logic ---
   const actionItems = filteredNotes
     .filter(note => note.actionItems && note.actionItems.length > 0)
     .flatMap(note => 
@@ -74,8 +73,8 @@ const DossNotes = () => {
         {filteredNotes.length > 0 ? (
           filteredNotes.map((note) => (
             <Grid item xs={12} sm={6} md={4} key={note.id}>
-              <Card>
-                <CardActionArea component={Link} to={`/dos/${note.id}`}>
+              <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <CardActionArea component={Link} to={`/dos/${note.id}`} sx={{ flexGrow: 1 }}>
                   <CardContent>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
                       <Typography variant="h5" component="div" noWrap>
@@ -83,15 +82,19 @@ const DossNotes = () => {
                       </Typography>
                       <Chip label={dossName} size="small" />
                     </Box>
-                    {/* Display the AI-generated summary */}
-                    <Typography variant="body2" color="text.secondary" sx={{
-                      display: '-webkit-box',
-                      overflow: 'hidden',
-                      WebkitBoxOrient: 'vertical',
-                      WebkitLineClamp: 3,
-                    }}>
-                      {note.summary || note.content}
-                    </Typography>
+                    <Box
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{
+                        display: '-webkit-box',
+                        overflow: 'hidden',
+                        WebkitBoxOrient: 'vertical',
+                        WebkitLineClamp: 3,
+                        '&.ql-editor': { p: 0, fontSize: '0.875rem' }
+                      }}
+                      className="ql-editor"
+                      dangerouslySetInnerHTML={{ __html: note.summary || note.content }}
+                    />
                   </CardContent>
                 </CardActionArea>
                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>

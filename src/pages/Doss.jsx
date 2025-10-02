@@ -14,26 +14,33 @@ import {
   Button,
   Box,
   Chip,
-  Divider,
-  ListItemButton
+  Fab,
+  Tooltip
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
 import { useNotification } from '../context/NotificationContext';
 
 const Doss = () => {
-  const { doss, addContextToDoss, deleteContextFromDoss } = useOutletContext();
+  const { doss, addDoss, addContextToDoss, deleteContextFromDoss } = useOutletContext();
   const { notify } = useNotification();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  // State for Context Dialog
+  const [isContextDialogOpen, setIsContextDialogOpen] = useState(false);
   const [selectedDoss, setSelectedDoss] = useState(null);
   const [newContext, setNewContext] = useState('');
 
-  const handleOpenDialog = (d) => {
+  // State for Add Doss Dialog
+  const [isAddDossDialogOpen, setIsAddDossDialogOpen] = useState(false);
+  const [newDossName, setNewDossName] = useState('');
+
+  const handleOpenContextDialog = (d) => {
     setSelectedDoss(d);
-    setIsDialogOpen(true);
+    setIsContextDialogOpen(true);
   };
 
-  const handleCloseDialog = () => {
-    setIsDialogOpen(false);
+  const handleCloseContextDialog = () => {
+    setIsContextDialogOpen(false);
     setSelectedDoss(null);
     setNewContext('');
   };
@@ -41,26 +48,35 @@ const Doss = () => {
   const handleAddContext = async (e) => {
     e.preventDefault();
     if (newContext.trim() && selectedDoss) {
-      try {
-        await addContextToDoss(selectedDoss.id, newContext.trim());
-        setNewContext('');
-        notify('Context added!', 'success');
-      } catch (error) {
-        notify('Failed to add context.', 'error');
-        console.error('Error adding context:', error);
-      }
+      await addContextToDoss(selectedDoss.id, newContext.trim());
+      setNewContext('');
+      notify('Context added!', 'success');
     }
   };
   
   const handleDeleteContext = async (contextToDelete) => {
     if (selectedDoss) {
-        try {
-            await deleteContextFromDoss(selectedDoss.id, contextToDelete);
-            notify('Context removed.', 'info');
-        } catch (error) {
-            notify('Failed to remove context.', 'error');
-            console.error('Error deleting context:', error);
-        }
+        await deleteContextFromDoss(selectedDoss.id, contextToDelete);
+        notify('Context removed.', 'info');
+    }
+  };
+
+  const handleOpenAddDossDialog = () => {
+    setIsAddDossDialogOpen(true);
+  };
+
+  const handleCloseAddDossDialog = () => {
+    setIsAddDossDialogOpen(false);
+    setNewDossName('');
+  };
+
+  const handleAddDoss = async () => {
+    if (newDossName.trim()) {
+      await addDoss(newDossName.trim());
+      notify('Doss created!', 'success');
+      handleCloseAddDossDialog();
+    } else {
+      notify('Doss name cannot be empty.', 'warning');
     }
   };
 
@@ -74,25 +90,23 @@ const Doss = () => {
           <ListItem
             key={d.id}
             secondaryAction={
-              <IconButton edge="end" aria-label="edit context" onClick={() => handleOpenDialog(d)}>
-                <EditIcon />
-              </IconButton>
+              <Tooltip title="Edit Context">
+                <IconButton edge="end" aria-label="edit context" onClick={() => handleOpenContextDialog(d)}>
+                  <EditIcon />
+                </IconButton>
+              </Tooltip>
             }
             disablePadding
           >
-            <ListItemButton component={Link} to={`/doss/${d.id}`}>
+            <ListItem button component={Link} to={`/doss/${d.id}/manage`}>
               <ListItemText primary={d.name} />
-            </ListItemButton>
+            </ListItem>
           </ListItem>
         ))}
-        <Divider sx={{ my: 1 }} />
-        <ListItemButton component={Link} to="/doss/others">
-            <ListItemText primary="Others" />
-        </ListItemButton>
       </List>
 
       {/* Context Management Dialog */}
-      <Dialog open={isDialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+      <Dialog open={isContextDialogOpen} onClose={handleCloseContextDialog} fullWidth maxWidth="sm">
         <DialogTitle>Manage Context for "{selectedDoss?.name}"</DialogTitle>
         <DialogContent>
           <Box component="form" onSubmit={handleAddContext} sx={{ display: 'flex', gap: 2, my: 2 }}>
@@ -104,24 +118,56 @@ const Doss = () => {
               size="small"
               fullWidth
             />
-            <Button type="submit" variant="contained">
-              Add
-            </Button>
+            <Button type="submit" variant="contained">Add</Button>
           </Box>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
             {(selectedDoss?.context || []).map((ctx, index) => (
-              <Chip
-                key={index}
-                label={ctx}
-                onDelete={() => handleDeleteContext(ctx)}
-              />
+              <Chip key={index} label={ctx} onDelete={() => handleDeleteContext(ctx)} />
             ))}
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Done</Button>
+          <Button onClick={handleCloseContextDialog}>Done</Button>
         </DialogActions>
       </Dialog>
+
+      {/* Add Doss Dialog */}
+      <Dialog open={isAddDossDialogOpen} onClose={handleCloseAddDossDialog}>
+        <DialogTitle>Create a New Doss</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Doss Name"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={newDossName}
+            onChange={(e) => setNewDossName(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleAddDoss()}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseAddDossDialog}>Cancel</Button>
+          <Button onClick={handleAddDoss}>Create</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Tooltip title="Create New Doss">
+        <Fab
+            color="primary"
+            aria-label="add"
+            sx={{
+                position: 'fixed',
+                bottom: (theme) => theme.spacing(4),
+                right: (theme) => theme.spacing(4),
+            }}
+            onClick={handleOpenAddDossDialog}
+        >
+            <AddIcon />
+        </Fab>
+      </Tooltip>
     </>
   );
 };

@@ -15,6 +15,10 @@ export default defineConfig({
         short_name: 'Dosser',
         description: 'An intelligent note-taking application.',
         theme_color: '#ffffff',
+        background_color: '#ffffff',
+        display: 'standalone',
+        scope: '/',
+        start_url: '/',
         icons: [
           {
             src: 'pwa-192x192.png',
